@@ -88,18 +88,18 @@ public static class InputUtil
 
 public interface IReadNextValueImpl<TResult>
 {
-    public abstract static TResult ReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider);
+    public static abstract TResult ReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider);
 
-    public abstract static bool TryReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider, out TResult value);
+    public static abstract bool TryReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider, out TResult value);
 }
 
 public readonly struct SpanParsableImpl<T> : IReadNextValueImpl<T> where T : ISpanParsable<T>
 {
     public static T ReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider)
     {
-        var span = input.AsSpan()[currentIndex..];
+        ReadOnlySpan<char> span = input.AsSpan()[currentIndex..];
         var index = span.IndexOf(separator);
-        var target = index == -1 ? span : span[..index];
+        ReadOnlySpan<char> target = index == -1 ? span : span[..index];
         if (target.Length == 0)
         {
             ThrowSeparatorNotFound();
@@ -116,9 +116,9 @@ public readonly struct SpanParsableImpl<T> : IReadNextValueImpl<T> where T : ISp
 
     public static bool TryReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider, out T value)
     {
-        var span = input.AsSpan()[currentIndex..];
+        ReadOnlySpan<char> span = input.AsSpan()[currentIndex..];
         var index = span.IndexOf(separator);
-        var target = index == -1 ? span : span[..index];
+        ReadOnlySpan<char> target = index == -1 ? span : span[..index];
         if (target.Length == 0)
         {
             value = default!;
@@ -134,9 +134,9 @@ public readonly struct StringImpl : IReadNextValueImpl<string>
 {
     public static string ReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider)
     {
-        var span = input.AsSpan()[currentIndex..];
+        ReadOnlySpan<char> span = input.AsSpan()[currentIndex..];
         var index = span.IndexOf(separator);
-        var target = index == -1 ? span : span[..index];
+        ReadOnlySpan<char> target = index == -1 ? span : span[..index];
         if (target.Length == 0)
         {
             ThrowSeparatorNotFound();
@@ -153,9 +153,9 @@ public readonly struct StringImpl : IReadNextValueImpl<string>
 
     public static bool TryReadNextValue(string input, ref int currentIndex, char separator, IFormatProvider formatProvider, out string value)
     {
-        var span = input.AsSpan()[currentIndex..];
+        ReadOnlySpan<char> span = input.AsSpan()[currentIndex..];
         var index = span.IndexOf(separator);
-        var target = index == -1 ? span : span[..index];
+        ReadOnlySpan<char> target = index == -1 ? span : span[..index];
         if (target.Length == 0)
         {
             value = default!;
@@ -261,7 +261,10 @@ public struct InputToken<TResult, TImpl> : IEnumerable<TResult>, IEnumerator<TRe
         val8 = ReadNextValue();
     }
 
-    private TResult ReadNextValue() => TImpl.ReadNextValue(_input, ref _currentIndex, _separator, _formatProvider);
+    private TResult ReadNextValue()
+    {
+        return TImpl.ReadNextValue(_input, ref _currentIndex, _separator, _formatProvider);
+    }
 
     public readonly InputToken<TResult, TImpl> GetEnumerator()
     {
@@ -274,7 +277,7 @@ public struct InputToken<TResult, TImpl> : IEnumerable<TResult>, IEnumerator<TRe
 
     public bool MoveNext()
     {
-        var val = TImpl.TryReadNextValue(_input, ref _currentIndex, _separator, _formatProvider, out var current);
+        var val = TImpl.TryReadNextValue(_input, ref _currentIndex, _separator, _formatProvider, out TResult? current);
         Current = current;
         return val;
     }
@@ -285,10 +288,10 @@ public struct InputToken<TResult, TImpl> : IEnumerable<TResult>, IEnumerator<TRe
         {
             return Array.Empty<TResult>();
         }
-        ref ushort begin = ref Unsafe.As<char, ushort>(ref MemoryMarshal.GetReference(_input.AsSpan()));
+        ref var begin = ref Unsafe.As<char, ushort>(ref MemoryMarshal.GetReference(_input.AsSpan()));
         var count = SpanHelpers.CountValueType(ref begin, _separator, _input.Length) + (_input[^1] == _separator ? 0 : 1);
         var array = new TResult[count];
-        for (int i = 0; i < array.Length; i++)
+        for (var i = 0; i < array.Length; i++)
         {
             array[i] = ReadNextValue();
         }
@@ -321,7 +324,7 @@ internal static class SpanHelpers
 {
     public static int CountValueType<T>(ref T current, T value, int length) where T : struct, IEquatable<T>?
     {
-        int count = 0;
+        var count = 0;
         ref T end = ref Unsafe.Add(ref current, length);
 
         if (Vector128.IsHardwareAccelerated && length >= Vector128<T>.Count)
@@ -329,7 +332,7 @@ internal static class SpanHelpers
             // Vector512 is not supported on .NET 7.0 so Vector512 code is not included.
             if (Vector256.IsHardwareAccelerated && length >= Vector256<T>.Count)
             {
-                Vector256<T> targetVector = Vector256.Create(value);
+                var targetVector = Vector256.Create(value);
                 ref T oneVectorAwayFromEnd = ref Unsafe.Subtract(ref end, Vector256<T>.Count);
                 do
                 {
@@ -342,13 +345,13 @@ internal static class SpanHelpers
                 // is cheaper than doing bitmask + popcount on the full last vector. To avoid complicated type
                 // based checks, other remainder-count based logic to determine the correct cut-off, for simplicity
                 // a half-vector size is chosen (based on benchmarks).
-                uint remaining = (uint)Unsafe.ByteOffset(ref current, ref end) / (uint)Unsafe.SizeOf<T>();
+                var remaining = (uint)Unsafe.ByteOffset(ref current, ref end) / (uint)Unsafe.SizeOf<T>();
                 if (remaining > Vector256<T>.Count / 2)
                 {
-                    uint mask = Vector256.Equals(Vector256.LoadUnsafe(ref oneVectorAwayFromEnd), targetVector).ExtractMostSignificantBits();
+                    var mask = Vector256.Equals(Vector256.LoadUnsafe(ref oneVectorAwayFromEnd), targetVector).ExtractMostSignificantBits();
 
                     // The mask contains some elements that may be double-checked, so shift them away in order to get the correct pop-count.
-                    uint overlaps = (uint)Vector256<T>.Count - remaining;
+                    var overlaps = (uint)Vector256<T>.Count - remaining;
                     mask >>= (int)overlaps;
                     count += BitOperations.PopCount(mask);
 
@@ -357,7 +360,7 @@ internal static class SpanHelpers
             }
             else
             {
-                Vector128<T> targetVector = Vector128.Create(value);
+                var targetVector = Vector128.Create(value);
                 ref T oneVectorAwayFromEnd = ref Unsafe.Subtract(ref end, Vector128<T>.Count);
                 do
                 {
@@ -366,13 +369,13 @@ internal static class SpanHelpers
                 }
                 while (!Unsafe.IsAddressGreaterThan(ref current, ref oneVectorAwayFromEnd));
 
-                uint remaining = (uint)Unsafe.ByteOffset(ref current, ref end) / (uint)Unsafe.SizeOf<T>();
+                var remaining = (uint)Unsafe.ByteOffset(ref current, ref end) / (uint)Unsafe.SizeOf<T>();
                 if (remaining > Vector128<T>.Count / 2)
                 {
-                    uint mask = Vector128.Equals(Vector128.LoadUnsafe(ref oneVectorAwayFromEnd), targetVector).ExtractMostSignificantBits();
+                    var mask = Vector128.Equals(Vector128.LoadUnsafe(ref oneVectorAwayFromEnd), targetVector).ExtractMostSignificantBits();
 
                     // The mask contains some elements that may be double-checked, so shift them away in order to get the correct pop-count.
-                    uint overlaps = (uint)Vector128<T>.Count - remaining;
+                    var overlaps = (uint)Vector128<T>.Count - remaining;
                     mask >>= (int)overlaps;
                     count += BitOperations.PopCount(mask);
 

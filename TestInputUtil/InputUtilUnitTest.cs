@@ -61,7 +61,7 @@ public class InputUtilUnitTest
 #if TESTSTRING
     [Theory]
     [InlineData("abc")]
-    [InlineData("‚ ‚¢‚¤‚¦‚¨")]
+    [InlineData("ã‚ã„ã†ãˆãŠ")]
     public void TestOneStringInput(string input)
     {
         RedirectStdIn(input);
@@ -235,7 +235,7 @@ public class InputUtilUnitTest
     [Theory]
     [InlineData("a b", new[] { 'a', 'b' })]
     [InlineData("# &", new[] { '#', '&' })]
-    [InlineData("‚  ‚¢", new[] { '‚ ', '‚¢' })]
+    [InlineData("ã‚ ã„", new[] { 'ã‚', 'ã„' })]
     public void TestTwoCharInput(string input, char[] expected)
     {
         RedirectStdIn(input);
@@ -279,7 +279,7 @@ public class InputUtilUnitTest
     [InlineData("abc def", "abc", "def")]
     [InlineData("cat dog", "cat", "dog")]
     [InlineData("hello world", "hello", "world")]
-    [InlineData("‚ ‚¢‚¤ ‚©‚«‚­‚¯‚±", "‚ ‚¢‚¤", "‚©‚«‚­‚¯‚±")]
+    [InlineData("ã‚ã„ã† ã‹ããã‘ã“", "ã‚ã„ã†", "ã‹ããã‘ã“")]
     public void TestTwoStringInput(string input, string firstWord, string secondWord)
     {
         RedirectStdIn(input);
@@ -348,7 +348,7 @@ public class InputUtilUnitTest
 #if TESTSTRING
     [Theory]
     [InlineData("abc def ghi", new[] { "abc", "def", "ghi" })]
-    [InlineData("‚ ‚¢‚¤ ‚©‚«‚­‚¯‚±", new[] { "‚ ‚¢‚¤", "‚©‚«‚­‚¯‚±" })]
+    [InlineData("ã‚ã„ã† ã‹ããã‘ã“", new[] { "ã‚ã„ã†", "ã‹ããã‘ã“" })]
     [InlineData("a", new[] { "a" })]
     public void TestForeachString(string input, string[] expected)
     {
@@ -472,7 +472,7 @@ public class InputUtilUnitTest
 
     [Theory]
     [InlineData("abc def ghi", new[] { "abc", "def", "ghi" })]
-    [InlineData("‚ ‚¢‚¤ ‚©‚«‚­‚¯‚±", new[] { "‚ ‚¢‚¤", "‚©‚«‚­‚¯‚±" })]
+    [InlineData("ã‚ã„ã† ã‹ããã‘ã“", new[] { "ã‚ã„ã†", "ã‹ããã‘ã“" })]
     [InlineData("a", new[] { "a" })]
     public void TestToArrayEqualString(string input, string[] expected)
     {
@@ -562,7 +562,7 @@ public class InputUtilUnitTest
 
     [Theory]
     [InlineData("abc,def,ghi", new[] { "abc", "def", "ghi" })]
-    [InlineData("‚ ‚¢‚¤,‚©‚«‚­‚¯‚±,‚³", new[] { "‚ ‚¢‚¤", "‚©‚«‚­‚¯‚±", "‚³" })]
+    [InlineData("ã‚ã„ã†,ã‹ããã‘ã“,ã•", new[] { "ã‚ã„ã†", "ã‹ããã‘ã“", "ã•" })]
     public void TestCustomSeparatorString(string input, string[] expected)
     {
         RedirectStdIn(input);
