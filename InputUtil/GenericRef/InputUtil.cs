@@ -14,7 +14,7 @@ public static class InputUtil
         return new InputToken<T, SpanParsableImpl<T>>(Console.ReadLine().AsSpan());
     }
 
-    public static InputToken<string, StringImpl> ReadLineString()
+    public static InputToken<string, StringImpl> ReadLine()
     {
         return new InputToken<string, StringImpl>(Console.ReadLine().AsSpan());
     }

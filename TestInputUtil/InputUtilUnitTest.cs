@@ -65,7 +65,7 @@ public class InputUtilUnitTest
     public void TestOneStringInput(string input)
     {
         RedirectStdIn(input);
-        string result = InputUtil.ReadLineString();
+        string result = InputUtil.ReadLine();
         Assert.Equal(input, result);
     }
 #endif
@@ -283,7 +283,7 @@ public class InputUtilUnitTest
     public void TestTwoStringInput(string input, string firstWord, string secondWord)
     {
         RedirectStdIn(input);
-        var (a, b) = InputUtil.ReadLineString();
+        var (a, b) = InputUtil.ReadLine();
         Assert.Equal(firstWord, a);
         Assert.Equal(secondWord, b);
     }
@@ -293,7 +293,7 @@ public class InputUtilUnitTest
     public void TestTwoStringInputTrailingSpace()
     {
         RedirectStdIn("abc def ");
-        var (a, b) = InputUtil.ReadLineString();
+        var (a, b) = InputUtil.ReadLine();
         Assert.Equal("abc", a);
         Assert.Equal("def", b);
     }
@@ -303,7 +303,7 @@ public class InputUtilUnitTest
     public void TestTwoStringInputExtraData()
     {
         RedirectStdIn("abc def ghi");
-        var (a, b) = InputUtil.ReadLineString();
+        var (a, b) = InputUtil.ReadLine();
         Assert.Equal("abc", a);
         Assert.Equal("def", b);
     }
@@ -314,7 +314,7 @@ public class InputUtilUnitTest
         RedirectStdIn("abc");
         Assert.Throws<FormatException>(() =>
         {
-            var (a, b) = InputUtil.ReadLineString();
+            var (a, b) = InputUtil.ReadLine();
         });
     }
 
@@ -354,7 +354,7 @@ public class InputUtilUnitTest
     {
         RedirectStdIn(input);
         var count = 0;
-        foreach (var i in InputUtil.ReadLineString())
+        foreach (var i in InputUtil.ReadLine())
         {
             Assert.Equal(expected[count++], i);
         }
@@ -365,7 +365,7 @@ public class InputUtilUnitTest
     public void TestForeachEmptyString()
     {
         RedirectStdIn("");
-        foreach (var _ in InputUtil.ReadLineString())
+        foreach (var _ in InputUtil.ReadLine())
         {
             Assert.Fail("");
         }
@@ -395,7 +395,7 @@ public class InputUtilUnitTest
     public void TestForeachIdempotentString()
     {
         RedirectStdIn("abc def ghi");
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var expected = new[] { "abc", "def", "ghi" };
         var count = 0;
         foreach (var i in token)
@@ -462,7 +462,7 @@ public class InputUtilUnitTest
     public void TestToArrayString()
     {
         RedirectStdIn("abc def ghi");
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var array = token.ToArray();
         Assert.Equal(3, array.Length);
         Assert.Equal("abc", array[0]);
@@ -477,7 +477,7 @@ public class InputUtilUnitTest
     public void TestToArrayEqualString(string input, string[] expected)
     {
         RedirectStdIn(input);
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var array = token.ToArray();
         Assert.Equal(expected.Length, array.Length);
         Assert.True(expected.SequenceEqual(array));
@@ -487,7 +487,7 @@ public class InputUtilUnitTest
     public void TestToArrayEmptyString()
     {
         RedirectStdIn("");
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var array = token.ToArray();
         Assert.Empty(array);
     }
@@ -496,7 +496,7 @@ public class InputUtilUnitTest
     public void TestToArrayTrailingSpaceString()
     {
         RedirectStdIn("abc def ghi ");
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var array = token.ToArray();
         Assert.Equal(3, array.Length);
         Assert.True(new[] { "abc", "def", "ghi" }.SequenceEqual(array));
@@ -522,7 +522,7 @@ public class InputUtilUnitTest
     {
         var str = string.Join(" ", Enumerable.Range(0, 100000).Select(x => x.ToString()));
         RedirectStdIn(str);
-        var token = InputUtil.ReadLineString();
+        var token = InputUtil.ReadLine();
         var count = 0;
         foreach (var i in token)
         {
@@ -566,7 +566,7 @@ public class InputUtilUnitTest
     public void TestCustomSeparatorString(string input, string[] expected)
     {
         RedirectStdIn(input);
-        var (a, b, c) = InputUtil.ReadLineString(CultureInfo.InvariantCulture, ',');
+        var (a, b, c) = InputUtil.ReadLine(CultureInfo.InvariantCulture, ',');
         Assert.Equal(expected[0], a);
         Assert.Equal(expected[1], b);
         Assert.Equal(expected[2], c);

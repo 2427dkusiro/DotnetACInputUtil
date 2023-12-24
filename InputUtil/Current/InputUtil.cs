@@ -52,7 +52,7 @@ public static class InputUtil
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static InputToken<string, StringImpl> ReadLineString()
+    public static InputToken<string, StringImpl> ReadLine()
     {
         return new InputToken<string, StringImpl>(Console.ReadLine() ?? throw new InvalidOperationException());
     }
@@ -65,7 +65,7 @@ public static class InputUtil
     /// <param name="separator"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static InputToken<string, StringImpl> ReadLineString(IFormatProvider formatProvider, char separator)
+    public static InputToken<string, StringImpl> ReadLine(IFormatProvider formatProvider, char separator)
     {
         return new InputToken<string, StringImpl>(Console.ReadLine() ?? throw new InvalidOperationException(), formatProvider, separator);
     }

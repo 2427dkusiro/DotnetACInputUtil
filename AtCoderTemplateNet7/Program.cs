@@ -10,14 +10,14 @@ using static InputUtil;
 double x = ReadLine<double>();
 var (m, n) = ReadLine<int>();
 var (a, b, c, d, e) = ReadLine<int>();
-var (s, t, u) = ReadLineString();
+var (s, t, u) = ReadLine();
 foreach (var item in ReadLine<int>())
 {
     // do something
 }
 var array = ReadLine<decimal>().ToArray();
 var max = ReadLine<long>().Select(x => x * 2).Where(x => x != 0).Max();
-var strs = ReadLineString().ToArray();
+var strs = ReadLine().ToArray();
 
 // こんなふうにコピペしてね
 
@@ -67,7 +67,7 @@ public static class InputUtil
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static InputToken<string, StringImpl> ReadLineString()
+    public static InputToken<string, StringImpl> ReadLine()
     {
         return new InputToken<string, StringImpl>(Console.ReadLine() ?? throw new InvalidOperationException());
     }
@@ -80,7 +80,7 @@ public static class InputUtil
     /// <param name="separator"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static InputToken<string, StringImpl> ReadLineString(IFormatProvider formatProvider, char separator)
+    public static InputToken<string, StringImpl> ReadLine(IFormatProvider formatProvider, char separator)
     {
         return new InputToken<string, StringImpl>(Console.ReadLine() ?? throw new InvalidOperationException(), formatProvider, separator);
     }
