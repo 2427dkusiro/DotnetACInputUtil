@@ -10,14 +10,17 @@ using static InputUtil;
 double x = ReadLine<double>();
 var (m, n) = ReadLine<int>();
 var (a, b, c, d, e) = ReadLine<int>();
+
+string str = ReadLine();
 var (s, t, u) = ReadLine();
+var strs = ReadLine().ToArray();
+
 foreach (var item in ReadLine<int>())
 {
     // do something
 }
 var array = ReadLine<decimal>().ToArray();
 var max = ReadLine<long>().Select(x => x * 2).Where(x => x != 0).Max();
-var strs = ReadLine().ToArray();
 
 // こんなふうにコピペしてね
 
